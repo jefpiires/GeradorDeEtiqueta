@@ -1,4 +1,5 @@
 'use client';
+import { parse } from "path";
 import { useState } from "react";
 
 type Filial = {
@@ -10,7 +11,7 @@ type Filial = {
 
 export default function Home() {
 
-  const filiais = [
+  const filiais: Filial[] = [
     {
       id: "486",
       code: "486",
@@ -3313,6 +3314,7 @@ export default function Home() {
   const [tipo, setTipo] = useState<string>("DESK");
   const [quantidade, setQuantidade] = useState<number>(0);
 
+
   const handleGenerateText = () => {
     if (FilialSelecionada && quantidade > 0) {
       const newTexts: string[] = [];
@@ -3336,64 +3338,151 @@ export default function Home() {
 
   const handleTipoChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    console.log('value', value);
+
+
+
     setTipo(!value ? 'DESK' : event.target.value);
   };
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value);
+    const value = parseInt(event.target.value)
+    if (value <= 0) {
+      return;
+    }
     setQuantidade(isNaN(value) ? 0 : value);
   };
 
   const handleLimparText = () => {
     setGeneratedTexts([]);
+    setQuantidade(0);
+    SetFilialSelecionada(null);
+  }
+
+  const imprimirEtiquetas = () => {
+    // Abre uma nova janela com o conteúdo do preview
+    const novaJanela = window.open('', '_blank');
+    if (novaJanela) {
+
+      novaJanela.document.write(`
+          <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Etiquetas para Impressão</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    margin-top: 30px;
+                    padding: 0;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+                .etiqueta {
+                    width: 300px;
+                    padding: 20px;
+                    border: 2px solid #000;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 32px;
+                    font-weight: bold;
+                    text-align: center;
+                    page-break-inside: avoid; /* Evita que as etiquetas sejam cortadas ao imprimir */
+                }
+            </style>
+        </head>
+        <body>
+            <div>
+                ${generatedTexts
+          .map(
+            (text) => `
+                    <div class="etiqueta">
+                        ${text}
+                    </div>
+                `
+          )
+          .join('')}
+            </div>
+            <script>
+                // Chama a função de impressão automaticamente
+                window.onload = () => {
+                    window.print();
+                };
+            <\/script>
+        </body>
+        </html>
+      `);
+      novaJanela.document.close();
+    };
   }
 
 
   return (
-    <div className="max-w-full h-screen flex flex-col bg-white">
-      <div className="items-center w-full justify-center flex bg-blue-900 h-24 border-b-2 border-white">
-        <h1 className="text-gray-200 text-4xl font-bold">GERADOR DE ETIQUETAS</h1>
-      </div>
+    <div className="bg-gray-100 flex justify-center min-h-screen">
+      <div className="bg-white p-12 rounded-lg shadow-md w-full max-w-max my-8">
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">GERADOR DE ETIQUETAS</h1>
 
-      <div className="bg-gray-300 h-full p-20">
 
-        <div className="flex flex-row  py-4">
-          <h4 className="text-3xl text-black">Filial: </h4>
-          <select value={FilialSelecionada?.id || ''} onChange={handleSelectChange}>
-            <option value="">Selecione uma filial...</option>
+
+        <div className="flex items-center mb-4">
+          <span className="text-xl text-gray-700 font-semibold mr-4">Filial: </span>
+          <select className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold " value={FilialSelecionada?.id || ''} onChange={handleSelectChange}>
+            <option value="" className="">Selecione uma filial...</option>
             {filiais.map((filial) => (
-              <option key={filial.id} value={filial.id}>
+              <option key={filial.id} value={filial.id} className="text-md font-bold">
                 {filial.nome} ({filial.code})
               </option>
             ))}
           </select>
+
         </div>
 
-        <div className="flex flex-row ml-8">
-          <h4>Tipo:</h4>
-          <select name="select" value={tipo} onChange={handleTipoChange}>
-            <option value="DESK">DESK</option>
-            <option value="PDV">PDV</option>
+        <div className="flex items-center mb-4">
+          <h1 className="text-lg font-semibold text-gray-700 mr-4">Tipo:</h1>
+          <select name="select" className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold" value={tipo} onChange={handleTipoChange}>
+            <option value="DESK" className="text-md font-bold">DESK</option>
+            <option value="PDV" className="text-md font-bold">PDV</option>
           </select>
         </div>
 
-        <div className="flex flex-row ml-8">
-          <h4>Quantidade:</h4>
-          <input type="number" value={quantidade} onChange={handleQuantityChange} />
+        <div className="flex items-center mb-6">
+          <h4 className="text-lg font-semibold text-gray-700 mr-4">Quantidade:</h4>
+          <input type="number" placeholder="Digite a quantidade" className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 placeholder:text-md" value={quantidade === 0 ? '' : quantidade} onChange={handleQuantityChange} />
         </div>
 
-        <div className="flex flex-row ml-8 items-center justify-center">
-          <button className="mx-8" onClick={handleGenerateText}>Gerar</button>
+        <div className="flex justify-between mb-6">
+          <button className="bg-green-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-green-600 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 " onClick={handleGenerateText}>Gerar</button>
 
-          <button className="mx-8" onClick={handleLimparText}>Limpar</button>
+          <button className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-600 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500" onClick={handleLimparText}>Limpar</button>
         </div>
 
-        {generatedTexts.map((text, index) => (
-          <div className="border-black border-2 bg-white w-1/2 h-24 flex justify-center items-center flex-row" key={index}>
-            <span className="font-bold text-4xl text-black">{text}</span>
+
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">Preview das Etiquetas</h2>
+          <div className="border border-gray-300 p-4 rounded-lg bg-gray-50">
+            {generatedTexts.map((text, index) => (
+              <div className="border-black border bg-white py-2 flex justify-center items-center flex-row" key={index} >
+                <span className="font-bold text-2xl text-black">{text}</span>
+              </div>
+            ))}
+
+
           </div>
-        ))}
+        </div>
+
+        {generatedTexts.length > 0 && (
+          <div className="mt-6">
+            <button id="imprimirEtiquetas" className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={imprimirEtiquetas}
+            >
+              Imprimir Etiquetas
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   );
