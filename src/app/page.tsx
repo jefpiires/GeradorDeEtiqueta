@@ -3420,13 +3420,13 @@ export default function Home() {
 
 
   return (
-    <div className="bg-gray-100 flex justify-center min-h-screen">
+    <div className="bg-gray-100 flex justify-center min-h-screen min-w-screen">
       <div className="bg-white p-12 rounded-lg shadow-md w-full max-w-max my-8">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">GERADOR DE ETIQUETAS</h1>
 
 
 
-        <div className="flex items-center mb-4">
+        <div className="flex items-center mb-4 max-[450px]:flex-col">
           <span className="text-xl text-gray-700 font-semibold mr-4">Filial: </span>
           <select className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold " value={FilialSelecionada?.id || ''} onChange={handleSelectChange}>
             <option value="" className="">Selecione uma filial...</option>
@@ -3439,7 +3439,7 @@ export default function Home() {
 
         </div>
 
-        <div className="flex items-center mb-4">
+        <div className="flex items-center mb-4 max-[450px]:flex-col">
           <h1 className="text-lg font-semibold text-gray-700 mr-4">Tipo:</h1>
           <select name="select" className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold" value={tipo} onChange={handleTipoChange}>
             <option value="DESK" className="text-md font-bold">DESK</option>
@@ -3447,7 +3447,7 @@ export default function Home() {
           </select>
         </div>
 
-        <div className="flex items-center mb-6">
+        <div className="flex items-center mb-6 max-[450px]:flex-col">
           <h4 className="text-lg font-semibold text-gray-700 mr-4">Quantidade:</h4>
           <input type="number" placeholder="Digite a quantidade" className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 placeholder:text-md" value={quantidade === 0 ? '' : quantidade} onChange={handleQuantityChange} />
         </div>
