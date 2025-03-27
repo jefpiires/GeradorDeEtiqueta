@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import Select from "react-select";
 
 type Filial = {
   id: string;
@@ -7,6 +8,10 @@ type Filial = {
   code: string;
 };
 
+type SelectOption = {
+  value: string;
+  label: string;
+};
 
 export default function Home() {
 
@@ -3312,10 +3317,17 @@ export default function Home() {
   const [generatedTexts, setGeneratedTexts] = useState<string[]>([]);
   const [tipo, setTipo] = useState<string>("DESK");
   const [quantidade, setQuantidade] = useState<number>(0);
+  const [nomeEtiquetaPersonalizada, setNomeEtiquetaPersonalizada] = useState<string>("");
+  const [EtiquetaPersonalizada, setEtiquetaPersonalizada] = useState<boolean>(false);
 
 
   const handleGenerateText = () => {
-    if (FilialSelecionada && quantidade > 0) {
+    if (EtiquetaPersonalizada && nomeEtiquetaPersonalizada) {
+      setGeneratedTexts((prevTexts) => [...prevTexts, nomeEtiquetaPersonalizada]);
+      return;
+    }
+
+    if (FilialSelecionada && quantidade > 0 && EtiquetaPersonalizada === false) {
       const newTexts: string[] = [];
       for (let i = 1; i <= quantidade; i++) {
         newTexts.push(`Z${FilialSelecionada.code} - ${tipo}${i}`);
@@ -3329,9 +3341,10 @@ export default function Home() {
     }
   };
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = (event.target.value);
-    const filial = filiais.find((c) => c.id === selectedId) || null;
+  const handleSelectChange = (selectedOption: SelectOption | null) => {
+    const filial = selectedOption
+      ? filiais.find((c) => c.id === selectedOption.value) || null
+      : null;
     SetFilialSelecionada(filial);
   };
 
@@ -3342,6 +3355,12 @@ export default function Home() {
 
     setTipo(!value ? 'DESK' : event.target.value);
   };
+
+  const handleEtiquetaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+
+    setEtiquetaPersonalizada(isChecked ? true : false);
+  }
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value)
@@ -3355,6 +3374,7 @@ export default function Home() {
     setGeneratedTexts([]);
     setQuantidade(0);
     SetFilialSelecionada(null);
+    setNomeEtiquetaPersonalizada("");
   }
 
   const imprimirEtiquetas = () => {
@@ -3425,23 +3445,37 @@ export default function Home() {
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">GERADOR DE ETIQUETAS</h1>
 
 
+        <div className="flex items-center mb-4">
+          <input type="checkbox" className="" onChange={handleEtiquetaChange} />
+          <span className="text-lg text-gray-700 ml-4 font-semibold">Etiqueta personalizada</span>
+        </div>
 
         <div className="flex items-center mb-4 max-[450px]:flex-col">
           <span className="text-xl text-gray-700 font-semibold mr-4">Filial: </span>
-          <select className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold " value={FilialSelecionada?.id || ''} onChange={handleSelectChange}>
-            <option value="" className="">Selecione uma filial...</option>
-            {filiais.map((filial) => (
-              <option key={filial.id} value={filial.id} className="text-md font-bold">
-                {filial.nome} ({filial.code})
-              </option>
-            ))}
-          </select>
+          {!EtiquetaPersonalizada ? (
+            <Select
+              className="flex-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold"
+              classNames={{
+                control: (state) => `rounded-lg bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold ${state.isFocused ? 'border-blue-500 ring-2 ring-blue-500 outline-none text-black' : ''
+                  }`,
+              }}
+              options={filiais.map(filiais => ({ value: filiais.id, label: filiais.code + ' - ' + filiais.nome }))}
+              onChange={handleSelectChange}
+              value={FilialSelecionada ? {
+                value: FilialSelecionada.id,
+                label: FilialSelecionada.code + ' - ' + FilialSelecionada.nome
+              } : null}
+              placeholder="Selecione uma filial..."
+            />) : (
+            <input type="text" placeholder="Digite o nome da etiqueta" className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 placeholder:text-sm placeholder:font-semibold placeholder:normal-case uppercase" value={nomeEtiquetaPersonalizada} onChange={(e) => setNomeEtiquetaPersonalizada(e.target.value.toUpperCase())}
+            />
+          )}
 
         </div>
 
         <div className="flex items-center mb-4 max-[450px]:flex-col">
           <h1 className="text-lg font-semibold text-gray-700 mr-4">Tipo:</h1>
-          <select name="select" className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold" value={tipo} onChange={handleTipoChange}>
+          <select name="select" className={`flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold disabled:bg-red-700 ${EtiquetaPersonalizada ? 'cursor-not-allowed bg-gray-100 text-gray-400 opacity-75' : 'text-black'}`} value={tipo} onChange={handleTipoChange} disabled={EtiquetaPersonalizada}>
             <option value="DESK" className="text-md font-bold">DESK</option>
             <option value="PDV" className="text-md font-bold">PDV</option>
           </select>
@@ -3449,7 +3483,7 @@ export default function Home() {
 
         <div className="flex items-center mb-6 max-[450px]:flex-col">
           <h4 className="text-lg font-semibold text-gray-700 mr-4">Quantidade:</h4>
-          <input type="number" placeholder="Digite a quantidade" className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 placeholder:text-md" value={quantidade === 0 ? '' : quantidade} onChange={handleQuantityChange} />
+          <input type="number" placeholder="Digite a quantidade" className={`flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 placeholder:text-sm placeholder:font-semibold ${EtiquetaPersonalizada ? 'cursor-not-allowed bg-gray-100 text-gray-400 opacity-75' : ''}`} value={quantidade === 0 ? '' : quantidade} onChange={handleQuantityChange} disabled={EtiquetaPersonalizada} />
         </div>
 
         <div className="flex justify-between mb-6">
