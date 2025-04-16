@@ -1,6 +1,6 @@
 'use client';
-import { useRef, useState } from "react";
-import Select, { SelectInstance } from "react-select";
+import { useState } from "react";
+import Select from "react-select";
 import { filiais, Filial } from "@/constants/filiais";
 
 type SelectOption = {
