@@ -16,9 +16,6 @@ export default function GeradorEtiquetas() {
     const [quantidade, setQuantidade] = useState<number>(0);
     const [nomeEtiquetaPersonalizada, setNomeEtiquetaPersonalizada] = useState<string>("");
     const [EtiquetaPersonalizada, setEtiquetaPersonalizada] = useState<boolean>(false);
-    const filialRef = useRef<SelectInstance | null>(null)
-    const tipoRef = useRef<HTMLSelectElement | null>(null)
-    const quantidadeRef = useRef<HTMLInputElement | null>(null)
 
 
     const handleGenerateText = () => {
@@ -187,7 +184,6 @@ export default function GeradorEtiquetas() {
                         name="select"
                         className={`flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-sm font-bold transition-opacity duration-300 disabled:bg-red-700 ${EtiquetaPersonalizada ? 'cursor-not-allowed bg-gray-100 text-gray-400 opacity-75' : 'text-black'}`}
                         value={tipo}
-                        ref={tipoRef}
                         onChange={handleTipoChange}
                         disabled={EtiquetaPersonalizada}>
                         <option value="DESK" className="text-md font-bold">DESK</option>
@@ -202,7 +198,6 @@ export default function GeradorEtiquetas() {
                         placeholder="Digite a quantidade"
                         className={`flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-slate-100 to-slate-200 text-black transition-opacity duration-300 placeholder:text-sm placeholder:font-semibold ${EtiquetaPersonalizada ? 'cursor-not-allowed bg-gray-100 text-gray-400 opacity-75' : ''}`}
                         value={quantidade === 0 ? '' : quantidade}
-                        ref={quantidadeRef}
                         onChange={handleQuantityChange}
                         disabled={EtiquetaPersonalizada} />
                 </div>
