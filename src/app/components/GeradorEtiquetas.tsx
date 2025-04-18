@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Select from "react-select";
 import { filiais, Filial } from "@/constants/filiais";
-import { CheckCheck, ListCheck } from "lucide-react";
 
 type SelectOption = {
     value: string;
