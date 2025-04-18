@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Select from "react-select";
 import { filiais, Filial } from "@/constants/filiais";
+import { CheckCheck, ListCheck } from "lucide-react";
 
 type SelectOption = {
     value: string;
@@ -16,6 +17,7 @@ export default function GeradorEtiquetas() {
     const [quantidade, setQuantidade] = useState<number>(0);
     const [nomeEtiquetaPersonalizada, setNomeEtiquetaPersonalizada] = useState<string>("");
     const [EtiquetaPersonalizada, setEtiquetaPersonalizada] = useState<boolean>(false);
+    const [checklistFormatacao, setChecklistFormataçao] = useState<boolean>(false);
 
 
     const handleGenerateText = () => {
@@ -67,6 +69,12 @@ export default function GeradorEtiquetas() {
         setQuantidade(isNaN(value) ? 0 : value);
     };
 
+    const handleChecklistFormataçaoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const isChecked = event.target.checked;
+
+        setChecklistFormataçao(isChecked ? true : false);
+    }
+
     const handleLimparText = () => {
         setGeneratedTexts([]);
         setQuantidade(0);
@@ -75,14 +83,65 @@ export default function GeradorEtiquetas() {
     }
 
     const imprimirEtiquetas = () => {
-        // Abre uma nova janela com o conteúdo do preview
         const novaJanela = window.open('', '_blank');
-        if (novaJanela) {
+        if (!novaJanela) return
 
-            novaJanela.document.write(`
-          <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
+        const etiquetasHTML = generatedTexts.map(
+            (text) => `
+                <div class="etiqueta">
+                    ${text}
+                </div>
+        `
+        ).join('')
+
+        const checklistHTML = checklistFormatacao ? generatedTexts.map(
+            (text) => `
+                <div class="checklist">
+                <div class="titulo">✔ CHECKLIST DE FORMATAÇÃO</div>
+                <div class="subtitulo">IMAGEM</div>
+                
+                <div class="linha">
+                    <div class="coluna"><div class="caixa"></div> MATRIZ</div>
+                    <div class="coluna"><div class="caixa"></div> VENDAS</div>
+                    <div class="coluna"><div class="caixa"></div> PDV</div>
+                </div>
+
+                <div class="linha">
+                    <div class="coluna"><div class="caixa"></div> Windows Update</div>
+                    <div class="coluna"><div class="caixa"></div> Periféricos</div>
+                </div>
+
+                <div class="linha">
+                    <div class="coluna"><div class="caixa"></div> Ativ. do Windows</div>
+                    <div class="coluna"><div class="caixa"></div> Fonte</div>
+                </div>
+
+                <div class="linha">
+                    <div class="coluna"><div class="caixa"></div> Antivirus</div>
+                    <div class="coluna"><div class="caixa"></div> Ativo:</div>
+                </div>
+
+                <div class="linha">
+                    <div class="coluna" style="border-right: none; font-weight: bold;">
+                    HOSTNAME: <strong style="margin-left: 15px;">${text}</strong>
+                    </div>
+                </div>
+
+                <div class="linha">
+                    <div class="coluna" style="border-right: none; font-weight: bold;">
+                    RESPONSÁVEL: ________________________
+                    </div>
+                </div>
+                </div>
+          `
+        )
+            .join('')
+            : '';
+
+        const htmlCompleto = `
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Etiquetas para Impressão</title>
@@ -96,6 +155,11 @@ export default function GeradorEtiquetas() {
                     flex-wrap: wrap;
                     gap: 10px;
                 }
+                .A4 {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: between;
+                }
                 .etiqueta {
                     width: 300px;
                     padding: 20px;
@@ -108,31 +172,83 @@ export default function GeradorEtiquetas() {
                     text-align: center;
                     page-break-inside: avoid; /* Evita que as etiquetas sejam cortadas ao imprimir */
                 }
+                .checklist {
+                    width: 250px;
+                    border: 2px solid #000;
+                    margin-left: 30px;
+                    page-break-inside: avoid; /* Evita que as etiquetas sejam cortadas ao imprimir */
+                }
+                .linha {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                }
+                .linha span, .linha div {
+                    padding: 2px;
+                    font-size: 8px;
+                }
+                .titulo {
+                    font-weight: bold;
+                    font-size: 8px;
+                    text-align: center;
+                    width: 100%;
+                    border-bottom: 1px solid black;
+                    padding: 2px 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 2px;
+                }
+                .subtitulo {
+                    text-align: center;
+                    font-size: 8px;
+                    font-weight: bold;
+                    border-bottom: 1px solid black;
+                    padding: 1px 0;
+                }
+                .caixa {
+                    width: 5px;
+                    height: 5px;
+                    border: 1px solid black;
+                    margin-right: 6px;
+                    display: inline-block;
+                }
+                .coluna {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    border-right: 1px solid black;
+                    justify-content: left;
+                    padding-left: 8px;
+                }
+                .coluna:last-child {
+                    border-right: none;
+                }
             </style>
         </head>
         <body>
-            <div>
-                ${generatedTexts
-                    .map(
-                        (text) => `
-                    <div class="etiqueta">
-                        ${text}
-                    </div>
-                `
-                    )
-                    .join('')}
+            <div class="A4">
+                <div>
+                    ${etiquetasHTML}
+                </div>
+                <div>
+                    ${checklistHTML}
+                </div>
+                <script>
+                    window.onload = () => {
+                        window.print();
+                    };
+                <\/script>
             </div>
-            <script>
-                // Chama a função de impressão automaticamente
-                window.onload = () => {
-                    window.print();
-                };
-            <\/script>
         </body>
         </html>
-      `);
-            novaJanela.document.close();
-        };
+        `
+
+        novaJanela.document.write(htmlCompleto);
+        novaJanela.document.close();
+
     }
 
 
@@ -147,7 +263,7 @@ export default function GeradorEtiquetas() {
 
 
                 <div className="flex items-center mb-4 border-b-2 border-gray-800 dark:border-gray-100 pb-2">
-                    <input type="checkbox" className="bg-gray-100 dark:bg-gray-700" onChange={handleEtiquetaChange} />
+                    <input type="checkbox" className="bg-gray-100 dark:bg-gray-700" disabled={checklistFormatacao} onChange={handleEtiquetaChange} />
                     <span className="text-lg text-gray-700 dark:text-gray-100 ml-4 font-semibold">Etiqueta personalizada</span>
                 </div>
 
@@ -202,6 +318,11 @@ export default function GeradorEtiquetas() {
                         disabled={EtiquetaPersonalizada} />
                 </div>
 
+                <div className="flex items-center mb-4  dark:border-gray-100 pb-2">
+                    <input type="checkbox" className={`bg-gray-100 dark:bg-gray-700 ${EtiquetaPersonalizada ? 'cursor-not-allowed' : ''}`} disabled={EtiquetaPersonalizada} onChange={handleChecklistFormataçaoChange} />
+                    <span className="text-lg text-gray-700 dark:text-gray-100 ml-4 font-semibold">Checklist Formatação</span>
+                </div>
+
                 <div className="flex justify-between mb-8">
                     <button className="bg-green-500 text-white font-bold px-4 py-2 rounded-xl hover:bg-green-600 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 " onClick={handleGenerateText}>Gerar</button>
 
@@ -213,14 +334,87 @@ export default function GeradorEtiquetas() {
                     <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-2">Preview das Etiquetas</h2>
                     <div className="border border-gray-300 p-4 rounded-lg bg-gray-50 shadow-lg">
                         {generatedTexts.map((text, index) => (
-                            <div className="border-black border bg-white py-2 flex justify-center items-center flex-row" key={index} >
+                            <div className="border-black border bg-white py-2 flex justify-center items-center flex-row" key={index}>
                                 <span className="font-bold text-2xl text-black">{text}</span>
                             </div>
                         ))}
-
-
                     </div>
                 </div>
+
+                {checklistFormatacao && (
+                    <div className="mt-6">
+                        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-2">Preview dos Checklist</h2>
+                        <div className="border border-gray-300 p-4 rounded-lg bg-gray-50 shadow-lg">
+                            {generatedTexts.map((text, index) => (
+                                <div className="flex flex-col mt-4 bg-white border border-black" key={index}>
+                                    <div className="flex flex-row justify-center items-center text-black border border-black">
+                                        <span className="font-bold ml-4">✔ CHECKLIST DE FORMATAÇÃO</span>
+                                    </div>
+                                    <div className="flex justify-center items-center text-black border border-black">
+                                        <span className="font-bold">IMAGEM</span>
+                                    </div>
+
+                                    <div className="flex flex-row justify-center items-center text-black border border-black">
+                                        <div className="flex flex-row pl-2 items-center border-r border-black w-full">
+                                            <div className="w-4 h-4 border border-black"></div>
+                                            <span className="ml-2">MATRIZ</span>
+                                        </div>
+                                        <div className="flex flex-row pl-2 items-center border-r border-black w-full">
+                                            <div className="w-4 h-4 border border-black"></div>
+                                            <span className="ml-2">VENDAS</span>
+                                        </div>
+                                        <div className="flex flex-row pl-2 px-4 items-center w-full">
+                                            <div className="w-4 h-4 border border-black"></div>
+                                            <span className="ml-2">PDV</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row justify-center items-center text-black border border-black">
+                                        <div className="flex flex-row pl-2 items-center border-r border-black w-full">
+                                            <div className="w-4 h-4 border border-black"></div>
+                                            <span className="ml-2">Windows Update</span>
+                                        </div>
+                                        <div className="flex flex-row pl-2 items-center w-full">
+                                            <div className="w-4 h-4 border border-black"></div>
+                                            <span className="ml-2">Perifericos</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center text-black border border-black">
+                                        <div className="flex flex-row pl-2 items-center border-r border-black w-full">
+                                            <div className="w-4 h-4 border border-black"></div>
+                                            <span className="ml-2">Ativ. do Windows</span>
+                                        </div>
+                                        <div className="flex flex-row pl-2 items-center w-full">
+                                            <div className="w-4 h-4 border border-black"></div>
+                                            <span className="ml-2">Fonte</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center text-black border border-black">
+                                        <div className="flex flex-row pl-2 items-center border-r border-black w-full">
+                                            <div className="w-4 h-4 border border-black"></div>
+                                            <span className="ml-2">Antivirus</span>
+                                        </div>
+                                        <div className="flex flex-row pl-2 items-center w-full">
+                                            <span className="">Ativo:</span>
+
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center text-black border border-black">
+                                        <div className="flex flex-row pl-2 items-center w-full">
+                                            <span className="">HOSTNAME:</span><span className="font-bold ml-8">{text}</span>
+                                        </div>
+
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center text-black border border-black">
+                                        <div className="flex flex-row justify-between pl-2 items-center w-full">
+                                            <span>RESPONSAVEL:</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {generatedTexts.length > 0 && (
                     <div className="mt-6">
