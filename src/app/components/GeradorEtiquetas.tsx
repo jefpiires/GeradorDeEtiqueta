@@ -172,7 +172,7 @@ export default function GeradorEtiquetas() {
                     page-break-inside: avoid; /* Evita que as etiquetas sejam cortadas ao imprimir */
                 }
                 .checklist {
-                    width: 250px;
+                    width: 300px;
                     border: 2px solid #000;
                     margin-left: 30px;
                     page-break-inside: avoid; /* Evita que as etiquetas sejam cortadas ao imprimir */
@@ -186,15 +186,15 @@ export default function GeradorEtiquetas() {
                 }
                 .linha span, .linha div {
                     padding: 2px;
-                    font-size: 8px;
+                    font-size: 11px;
                 }
                 .titulo {
                     font-weight: bold;
-                    font-size: 8px;
+                    font-size: 11px;
                     text-align: center;
                     width: 100%;
                     border-bottom: 1px solid black;
-                    padding: 2px 0;
+                    padding: 1px 0;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -202,7 +202,7 @@ export default function GeradorEtiquetas() {
                 }
                 .subtitulo {
                     text-align: center;
-                    font-size: 8px;
+                    font-size: 11px;
                     font-weight: bold;
                     border-bottom: 1px solid black;
                     padding: 1px 0;
