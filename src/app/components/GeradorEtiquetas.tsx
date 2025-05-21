@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Select from "react-select";
 import { filiais, Filial } from "@/constants/filiais";
+import ScrollBottomButton from "./ScrollBottomButton";
 
 type SelectOption = {
     value: string;
@@ -254,6 +255,9 @@ export default function GeradorEtiquetas() {
     return (
         <div className="bg-gray-100 flex justify-center min-h-screen min-w-screen dark:bg-gray-900 dark:text-white">
             <div className="bg-white p-12 rounded-lg shadow-xl w-full max-w-max my-8 dark:bg-gray-800 dark:text-white">
+
+                {generatedTexts.length > 0 && (<div><ScrollBottomButton /></div>)}
+
                 <div className="flex items-center justify-center mb-6">
                     <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100">GERADOR DE ETIQUETAS</h1>
                     <span className="text-2xl">🏷️</span>

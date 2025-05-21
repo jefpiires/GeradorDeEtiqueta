@@ -13,7 +13,7 @@ export default function ThemeToggleButton() {
     return (
         <button
             onClick={handleTggleTheme}
-            className="fixed bottom-4 right-4 bg-gray-100 dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-full shadow-md transition"
+            className="fixed bottom-4 right-4 bg-gray-100 dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-full shadow-lg transition hover:bg-gray-200 cursor-pointer dark:hover:bg-gray-600"
         >
             {theme === 'light' ? (
                 <span role="img" aria-label="Dark Mode">
